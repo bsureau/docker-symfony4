@@ -23,7 +23,7 @@ MYSQL_USER=root
 MYSQL_PASS=root
 ```
 
-# Install with Docker
+# 2. Install with Docker
 
 Install Docker Compose if you haven't installed yet: ``` https://docs.docker.com/compose/install/#prerequisites ```
 
@@ -41,7 +41,7 @@ $ sudo [nano|vim|...]  /etc/hosts
 # servername must match with APP_SERVER_NAME in your .env.dist file (here, sfstarter.local)
 ```
 
-# Test your website
+# 3. Test your website
 ```
 http[s]://www.[servername].local/
 ```
