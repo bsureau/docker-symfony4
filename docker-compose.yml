@@ -1,0 +1,55 @@
+version: '3'
+
+services:
+
+  #############
+  #   MySQL   #
+  #############
+  db:
+    image: mysql:5.7
+    container_name: "mysql-${APP_PROJECT_DIR_NAME}"
+    volumes:
+      - ./docker/containers/mysql/:/var/lib/mysql/:cached
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_PASSWORD: ${MYSQL_PASS}
+
+  #############
+  #  PHP-FPM  #
+  #############
+  php-fpm:
+    build:
+      context: ./docker/containers/php7-fpm
+      args:
+        APP_PROJECT_DIR_NAME: ${APP_PROJECT_DIR_NAME}
+    container_name: "php-${APP_PROJECT_DIR_NAME}"
+    volumes:
+      - ./symfony/:/var/www/project/${APP_PROJECT_DIR_NAME}:cached
+    expose:
+      - "9000"
+    environment:
+      APP_PROJECT_DIR_NAME: ${APP_PROJECT_DIR_NAME}
+
+  #############
+  #   SERVER  #
+  #############
+  nginx:
+    build:
+      context: ./docker/containers/nginx
+    container_name: "nginx-${APP_PROJECT_DIR_NAME}"
+    volumes:
+      - ./symfony/:/var/www/project/${APP_PROJECT_DIR_NAME}:cached
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      APP_SERVER_NAME: ${APP_SERVER_NAME}
+      APP_PROJECT_DIR_NAME: ${APP_PROJECT_DIR_NAME}
+    # Express dependency between services
+    # Starts services in dependency order (db, php-fpm, then nginx)
+    depends_on:
+      - db
+      - php-fpm
